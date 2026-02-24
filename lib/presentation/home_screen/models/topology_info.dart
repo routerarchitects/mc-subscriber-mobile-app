@@ -6,9 +6,15 @@ class TopologyInfo {
   String? boardId;
   Edges? edges;
   List<Node>? nodes;
+  List<Client>? historicalClients;
   DateTime? timestamp;
 
-  TopologyInfo({this.boardId, this.nodes, this.timestamp});
+  TopologyInfo({
+    this.boardId,
+    this.nodes,
+    this.historicalClients,
+    this.timestamp,
+  });
 
   factory TopologyInfo.fromJson(Map<String, dynamic> json) =>
       _$TopologyInfoFromJson(json);
@@ -88,6 +94,12 @@ class Client {
   String? station;
   @JsonKey(name: 'tx_rate_bitrate')
   int? txRateBitrate;
+  String? fingerprint;
+  @JsonKey(name: 'rx_speed', defaultValue: 0)
+  final double rxSpeed;
+  @JsonKey(name: 'tx_speed', defaultValue: 0)
+  final double txSpeed;
+  String? blocked;
 
   Client({
     this.connected,
@@ -97,7 +109,13 @@ class Client {
     this.rxRateChwidth,
     this.station,
     this.txRateBitrate,
+    this.fingerprint,
+    this.rxSpeed = 0,
+    this.txSpeed = 0,
+    this.blocked,
   });
+
+  get isBlocked => blocked == '1';
 
   factory Client.fromJson(Map<String, dynamic> json) => _$ClientFromJson(json);
   Map<String, dynamic> toJson() => _$ClientToJson(this);

@@ -96,4 +96,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get remove_device_failed => 'Failed to remove device';
+
+  @override
+  String get pause_device_success => 'Device paused successfully';
+
+  @override
+  String get pause_device_error => 'Failed to pause device';
+
+  @override
+  String get resume_device_success => 'Device resumed successfully';
+
+  @override
+  String get resume_device_error => 'Failed to resume device';
 }

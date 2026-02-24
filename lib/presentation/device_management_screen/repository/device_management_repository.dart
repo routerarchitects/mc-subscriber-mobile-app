@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:family_wifi/core/network/api_constants.dart';
 import 'package:family_wifi/core/network/api_exception.dart';
 import 'package:family_wifi/core/network/api_helper.dart';
+import 'package:family_wifi/core/network/common/configure_payload.dart';
 import 'package:family_wifi/core/network/result.dart';
 import 'package:family_wifi/core/utils/print_log_helper.dart';
 import 'package:family_wifi/l10n/app_localization_extension.dart';
@@ -29,6 +30,29 @@ class DeviceManagementRepository {
       //   );
       // }
       return Result.success(true);
+    } catch (error, stack) {
+      logPrint('$error, \n$stack');
+      return handleApiException(error);
+    }
+  }
+
+  Future<Result> pauseResumeDevice(String macAddress, bool pause) async {
+    try {
+      Map<String, dynamic> result = await _apiHelper.request(
+        ApiConstants.action,
+        requestType: RequestType.POST,
+        parameters: {'action': ApiConstants.actionConfigure},
+        requestBody: ConfigurePayload(
+          clientItems: [
+            ClientItem(mac: macAddress, access: pause ? 'deny' : 'allow'),
+          ],
+        ),
+      );
+      if (result['Code'] != null) {
+        return Result.success(true);
+      } else {
+        return Result.error(await result['Details'] ?? 'invalid_response'.tr());
+      }
     } catch (error, stack) {
       logPrint('$error, \n$stack');
       return handleApiException(error);

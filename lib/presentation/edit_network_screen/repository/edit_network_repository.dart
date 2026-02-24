@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:family_wifi/core/network/api_constants.dart';
 import 'package:family_wifi/core/network/api_exception.dart';
 import 'package:family_wifi/core/network/api_helper.dart';
+import 'package:family_wifi/core/network/common/configure_payload.dart';
 import 'package:family_wifi/core/network/result.dart';
 import 'package:family_wifi/core/utils/print_log_helper.dart';
 import 'package:family_wifi/core/utils/shared_preferences_helper.dart';
@@ -28,7 +29,12 @@ class EditNetworkRepository {
         ApiConstants.action,
         requestType: RequestType.POST,
         parameters: {'action': ApiConstants.actionConfigure},
-        requestBody: editNetworkModel,
+        requestBody: ConfigurePayload(
+          editNetworkItem: EditNetworkItem(
+            name: editNetworkModel.ssid,
+            password: editNetworkModel.password,
+          ),
+        ),
       );
       if (result['Code'] != null) {
         return Result.success(true);

@@ -1,5 +1,7 @@
 import 'package:family_wifi/core/app_export.dart';
+import 'package:family_wifi/core/network/api_helper.dart';
 import 'package:family_wifi/presentation/device_management_screen/provider/device_management_provider.dart';
+import 'package:family_wifi/presentation/device_management_screen/repository/device_management_repository.dart';
 import 'package:family_wifi/presentation/device_management_screen/widgets/mobile_devices_tab.dart';
 import 'package:family_wifi/presentation/home_screen/models/subscriber_info.dart';
 import 'package:family_wifi/presentation/home_screen/models/topology_info.dart'
@@ -288,63 +290,81 @@ class _DashboardOverviewTabState extends State<DashboardOverviewTab>
       barrierDismissible: true,
       builder: (context) {
         return Dialog(
-          child: ValueListenableProvider<TopologyInfo?>.value(
-            value: homeController.topologyInfo,
-            child: Provider<DeviceManagementProvider>(
-              create: (BuildContext context) {
-                final deviceMngmtProvider = DeviceManagementProvider.withNode(
-                  selectedNodeSerial:
-                      (selectedNode.key!.value as GraphNodeInfo).addtlInfo,
-                );
-                deviceMngmtProvider.handleTopologyInfo(
-                  homeController.topologyInfo.value,
-                );
-                return deviceMngmtProvider;
-              },
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8.0,
-                      vertical: 8.0,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: ProxyProvider<ApiHelper, DeviceManagementRepository>(
+            update: (_, apiHelper, deviceMgmtRepo) {
+              return deviceMgmtRepo ?? DeviceManagementRepository(apiHelper);
+            },
+            child: ValueListenableProvider<TopologyInfo?>.value(
+              value: homeController.topologyInfo,
+              child:
+                  ProxyProvider<
+                    DeviceManagementRepository,
+                    DeviceManagementProvider
+                  >(
+                    update:
+                        (
+                          BuildContext context,
+                          DeviceManagementRepository repository,
+                          DeviceManagementProvider? previous,
+                        ) {
+                          final deviceMngmtProvider =
+                              previous ??
+                              DeviceManagementProvider(
+                                homeController.loadingStateProvider,
+                                homeController.alertStateProvider,
+                                repository,
+                              );
+                          deviceMngmtProvider.handleTopologyInfo(
+                            homeController.topologyInfo.value,
+                          );
+                          return deviceMngmtProvider;
+                        },
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Expanded(
-                          child: Text(
-                            'Mobile Device Clients',
-                            style: TextStyleHelper.instance.title18BoldInter,
-                            textAlign: TextAlign.center,
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8.0,
+                            vertical: 8.0,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  'Mobile Device Clients',
+                                  style:
+                                      TextStyleHelper.instance.title18BoldInter,
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                              IconButton(
+                                onPressed: () => NavigatorService.goBack(),
+                                icon: Icon(Icons.close_rounded),
+                              ),
+                            ],
                           ),
                         ),
-                        IconButton(
-                          onPressed: () => NavigatorService.goBack(),
-                          icon: Icon(Icons.close_rounded),
+                        Flexible(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.only(
+                              topLeft: const Radius.circular(4.0),
+                              topRight: const Radius.circular(4.0),
+                              bottomLeft: const Radius.circular(32.0),
+                              bottomRight: const Radius.circular(32.0),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 1.0,
+                                vertical: 1.0,
+                              ),
+                              child: MobileDevicesTab(shrinkWrap: true),
+                            ),
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  Flexible(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.only(
-                        topLeft: const Radius.circular(4.0),
-                        topRight: const Radius.circular(4.0),
-                        bottomLeft: const Radius.circular(32.0),
-                        bottomRight: const Radius.circular(32.0),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 1.0,
-                          vertical: 1.0,
-                        ),
-                        child: MobileDevicesTab(shrinkWrap: true),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
             ),
           ),
         );

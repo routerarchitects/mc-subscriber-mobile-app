@@ -38,7 +38,7 @@ class DeviceManagementScreen extends StatefulWidget {
                         DeviceManagementProvider(
                           homeController.loadingStateProvider,
                           homeController.alertStateProvider,
-                          repository: repository,
+                          repository,
                         );
                     deviceMngmtProvider.handleTopologyInfo(topologyInfo);
                     return deviceMngmtProvider;
@@ -56,6 +56,7 @@ class DeviceManagementScreen extends StatefulWidget {
 class _DeviceManagementScreenState extends State<DeviceManagementScreen>
     with TickerProviderStateMixin {
   late final HomeProvider homeController;
+  late final DeviceManagementProvider deviceManagementProvider;
   late TabController _tabController;
 
   @override
@@ -63,12 +64,16 @@ class _DeviceManagementScreenState extends State<DeviceManagementScreen>
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     homeController = Provider.of<HomeProvider>(context, listen: false);
+    deviceManagementProvider = Provider.of<DeviceManagementProvider>(
+      context,
+      listen: false,
+    );
   }
 
   @override
   void dispose() {
     _tabController.dispose();
-    context.read<DeviceManagementProvider>().dispose();
+    deviceManagementProvider.dispose();
     super.dispose();
   }
 
@@ -85,7 +90,7 @@ class _DeviceManagementScreenState extends State<DeviceManagementScreen>
         // A more general solution to allow the outer scroll view to trigger the refresh
         return notification.depth == 2;
       },
-      key: context.read<DeviceManagementProvider>().refreshIndicatorKey,
+      key: deviceManagementProvider.refreshIndicatorKey,
       onRefresh: () => homeController.fetchTopologyInfo(),
       child: NestedScrollView(
         floatHeaderSlivers: true,

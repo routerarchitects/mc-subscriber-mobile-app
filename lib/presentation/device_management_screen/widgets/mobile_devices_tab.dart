@@ -42,7 +42,10 @@ class MobileDevicesTab extends StatelessWidget {
                         );
                       },*/
                     onPauseTap: () {
-                      deviceMngmtController.toggleDevicePause(items[index]);
+                      deviceMngmtController.toggleDevicePause(
+                        items[index],
+                        context,
+                      );
                     },
                   );
                 },

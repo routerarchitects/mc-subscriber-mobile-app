@@ -26,5 +26,9 @@
   "remove_device_confirm_title": "Remove Device",
   "remove_device_confirm_message": "Are you sure you want to remove this device?",
   "remove_device_confirm_action": "Remove",
-  "remove_device_failed": "Failed to remove device"
+  "remove_device_failed": "Failed to remove device",
+  "pause_device_success": "Device paused successfully",
+  "pause_device_error": "Failed to pause device",
+  "resume_device_success": "Device resumed successfully",
+  "resume_device_error": "Failed to resume device"
 }

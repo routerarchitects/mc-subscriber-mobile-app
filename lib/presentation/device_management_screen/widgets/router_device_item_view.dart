@@ -61,16 +61,14 @@ class RouterDeviceItemView extends StatelessWidget {
             if (showActionButton) SizedBox(width: 16.h),
             if (showActionButton)
               CustomButton(
+                width: 96.0,
                 text: deviceItem.actionButtonText!,
                 onPressed: onButtonTap,
                 backgroundColor: appTheme.blue_gray_900,
                 textColor: appTheme.white_A700,
                 fontSize: 14.fSize,
                 fontWeight: FontWeight.w500,
-                padding: EdgeInsets.symmetric(
-                  horizontal: (deviceItem.isMainRouter) ? 8.h : 20.h,
-                  vertical: 6.h,
-                ),
+                padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
               ),
           ],
         ),

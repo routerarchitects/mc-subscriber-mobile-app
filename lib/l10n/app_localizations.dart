@@ -261,6 +261,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to remove device'**
   String get remove_device_failed;
+
+  /// No description provided for @pause_device_success.
+  ///
+  /// In en, this message translates to:
+  /// **'Device paused successfully'**
+  String get pause_device_success;
+
+  /// No description provided for @pause_device_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to pause device'**
+  String get pause_device_error;
+
+  /// No description provided for @resume_device_success.
+  ///
+  /// In en, this message translates to:
+  /// **'Device resumed successfully'**
+  String get resume_device_success;
+
+  /// No description provided for @resume_device_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to resume device'**
+  String get resume_device_error;
 }
 
 class _AppLocalizationsDelegate
