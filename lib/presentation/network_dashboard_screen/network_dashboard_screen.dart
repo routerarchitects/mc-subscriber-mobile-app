@@ -13,7 +13,7 @@ class NetworkDashboardScreen extends StatefulWidget {
   const NetworkDashboardScreen({Key? key}) : super(key: key);
 
   static Widget builder(BuildContext context) {
-    final homeController = Provider.of<HomeProvider>(context, listen: false);
+    final homeController = context.read<HomeProvider>();
     return ValueListenableProvider<TopologyInfo?>.value(
       value: homeController.topologyInfo,
       child: ProxyProvider<TopologyInfo?, NetworkDashboardProvider>(
@@ -27,6 +27,7 @@ class NetworkDashboardScreen extends StatefulWidget {
               netProvider.handleTopologyInfo(topologyInfo);
               return netProvider;
             },
+        dispose: (_, provider) => provider.dispose(),
         child: const NetworkDashboardScreen(),
       ),
     );

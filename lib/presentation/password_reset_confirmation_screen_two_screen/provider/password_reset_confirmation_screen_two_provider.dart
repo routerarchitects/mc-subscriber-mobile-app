@@ -81,9 +81,4 @@ class PasswordResetConfirmationScreenTwoProvider with BaseBloc {
       showAlert(await 'something_went_wrong'.tr());
     }
   }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
 }

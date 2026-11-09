@@ -369,6 +369,70 @@ class StyleHelper {
     );
   }
 
+  static Future<T?> showAdaptiveBottomSheet<T>(
+    BuildContext ctx, {
+    required Widget child,
+    bool isScrollControlled = true,
+    bool isDismissible = false,
+    bool useRootNavigator = true,
+    BorderRadius borderRadius = const BorderRadius.only(
+      topLeft: const Radius.circular(16.0),
+      topRight: const Radius.circular(16.0),
+    ),
+  }) {
+    if (isIOS) {
+      return showCupertinoModalPopup<T>(
+        context: ctx,
+        useRootNavigator: useRootNavigator,
+        barrierDismissible: isDismissible,
+        builder: (context) => SafeArea(
+          child: Padding(
+            padding: EdgeInsets.only(
+              top: MediaQuery.paddingOf(ctx).top,
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+            ),
+            child: ClipRRect(
+              borderRadius: borderRadius,
+              child: Material(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).canvasColor,
+                  ),
+                  child: child,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    } else {
+      return showModalBottomSheet<T>(
+        context: ctx,
+        isScrollControlled: isScrollControlled,
+        isDismissible: isDismissible,
+        enableDrag: isDismissible,
+        showDragHandle: isDismissible,
+        backgroundColor: Theme.of(ctx).canvasColor,
+        useRootNavigator: useRootNavigator,
+        shape: RoundedRectangleBorder(borderRadius: borderRadius),
+        builder: (context) {
+          return PopScope(
+            canPop: isDismissible,
+            child: SafeArea(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  top: MediaQuery.paddingOf(ctx).top,
+                  bottom: MediaQuery.of(context).viewInsets.bottom,
+                ),
+                child: child,
+              ),
+            ),
+          );
+        },
+      );
+    }
+  }
+
   /* static PreferredSizeWidget buildAppBar(
     BuildContext context,
     String? title, {
@@ -947,61 +1011,6 @@ class StyleHelper {
           controller: scrollController,
           thumbVisibility: isAlwaysShown,
           child: child);
-    }
-  }
-
-  static Future<T?> showAdaptiveBottomSheet<T>(BuildContext ctx,
-      {required Widget child,
-      bool isScrollControlled = true,
-      bool isDismissible = false,
-      bool useRootNavigator = true,
-      BorderRadius borderRadius = const BorderRadius.only(
-        topLeft: Radius.circular(12.0),
-        topRight: Radius.circular(12.0),
-      )}) {
-    double topPadding = 0.0;
-    topPadding =
-        MediaQueryData.fromWindow(WidgetsBinding.instance.window).padding.top;
-    // Use hardcoded status bar height if 0
-    if (topPadding == 0.0) {
-      topPadding = 36.0;
-    }
-    if (isIOS) {
-      return showCupertinoModalPopup<T>(
-          context: ctx,
-          useRootNavigator: useRootNavigator,
-          barrierDismissible: isDismissible,
-          builder: (context) => SafeArea(
-                child: Padding(
-                  padding: EdgeInsets.only(top: topPadding),
-                  child: ClipRRect(
-                      borderRadius: borderRadius,
-                      child: Material(
-                        child: DecoratedBox(
-                            decoration: BoxDecoration(
-                                color: Theme.of(context).canvasColor),
-                            child: child),
-                      )),
-                ),
-              ));
-    } else {
-      return showModalBottomSheet<T>(
-          context: ctx,
-          isScrollControlled: isScrollControlled,
-          isDismissible: isDismissible,
-          backgroundColor: Colors.transparent,
-          useRootNavigator: useRootNavigator,
-          builder: (context) {
-            return Padding(
-              padding: EdgeInsets.only(top: topPadding),
-              child: ClipRRect(
-                  borderRadius: borderRadius,
-                  child: DecoratedBox(
-                      decoration:
-                          BoxDecoration(color: Theme.of(context).canvasColor),
-                      child: child)),
-            );
-          });
     }
   }
 

@@ -1,14 +1,13 @@
 import 'dart:convert';
 
 import 'package:family_wifi/core/utils/navigator_service.dart';
-import 'package:family_wifi/core/utils/print_log_helper.dart';
 import 'package:family_wifi/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 extension BuildContextExtension on BuildContext {
-  AppLocalizations? get translator {
-    return AppLocalizations.of(this);
+  AppLocalizations get translator {
+    return AppLocalizations.of(this)!;
   }
 }
 
@@ -24,7 +23,6 @@ extension TranslateStringExtension on String {
     AppLocalizations? appLocalizations = globalAppLoc;
     if (appLocalizations != null) {
       String localeName = appLocalizations.localeName;
-      logPrint('trByKey: localeName--->$localeName');
       String arbContent = await rootBundle.loadString(
         'lib/l10n/app_$localeName.arb',
       );

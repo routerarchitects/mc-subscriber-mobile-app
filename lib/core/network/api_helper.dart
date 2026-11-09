@@ -279,4 +279,7 @@ String handleErrorResponseCode(int responseCode) {
 bool isUnauthorized(dynamic data) =>
     data != null && data is int && (data == 401 || data == 403);
 
+bool isResourceNotFound(dynamic data) =>
+    data != null && data is int && data == 404;
+
 enum RequestType { GET, POST, PUT, DELETE }

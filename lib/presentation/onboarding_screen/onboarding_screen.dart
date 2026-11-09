@@ -11,20 +11,21 @@ class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({Key? key}) : super(key: key);
 
   static Widget builder(BuildContext context) {
-    return ProxyProvider2<
-      ApiHelper,
-      SharedPreferencesHelper,
-      OnboardingRepository
-    >(
-      update: (_, apiHelper, sharedPrefHelper, loginRepo) {
-        return loginRepo ?? OnboardingRepository(apiHelper, sharedPrefHelper);
-      },
-      child: ProxyProvider<OnboardingRepository, OnboardingProvider>(
-        update: (_, onboardingRepo, onboardingProvider) {
-          return onboardingProvider ?? OnboardingProvider(onboardingRepo);
-        },
-        child: const OnboardingScreen(),
-      ),
+    return MultiProvider(
+      providers: [
+        Provider<OnboardingRepository>(
+          create: (_) => OnboardingRepository(
+            context.read<ApiHelper>(),
+            context.read<SharedPreferencesHelper>(),
+          ),
+        ),
+        Provider<OnboardingProvider>(
+          create: (lCtx) =>
+              OnboardingProvider(lCtx.read<OnboardingRepository>()),
+          dispose: (_, provider) => provider.dispose(),
+        ),
+      ],
+      child: const OnboardingScreen(),
     );
   }
 

@@ -8,12 +8,14 @@ class NavigatorService {
     String routeName, {
     dynamic arguments,
   }) async {
-    return navigatorKey.currentState
-        ?.pushNamed(routeName, arguments: arguments);
+    return navigatorKey.currentState?.pushNamed(
+      routeName,
+      arguments: arguments,
+    );
   }
 
-  static void goBack() {
-    return navigatorKey.currentState?.pop();
+  static void goBack({dynamic result}) {
+    return navigatorKey.currentState?.pop(result);
   }
 
   static Future<dynamic> pushNamedAndRemoveUntil(
@@ -22,15 +24,19 @@ class NavigatorService {
     dynamic arguments,
   }) async {
     return navigatorKey.currentState?.pushNamedAndRemoveUntil(
-        routeName, (route) => routePredicate,
-        arguments: arguments);
+      routeName,
+      (route) => routePredicate,
+      arguments: arguments,
+    );
   }
 
   static Future<dynamic> popAndPushNamed(
     String routeName, {
     dynamic arguments,
   }) async {
-    return navigatorKey.currentState
-        ?.popAndPushNamed(routeName, arguments: arguments);
+    return navigatorKey.currentState?.popAndPushNamed(
+      routeName,
+      arguments: arguments,
+    );
   }
 }

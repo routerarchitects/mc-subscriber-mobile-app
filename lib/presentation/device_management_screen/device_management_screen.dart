@@ -13,38 +13,31 @@ class DeviceManagementScreen extends StatefulWidget {
   const DeviceManagementScreen({Key? key}) : super(key: key);
 
   static Widget builder(BuildContext context) {
-    final homeController = Provider.of<HomeProvider>(context, listen: false);
-    return ProxyProvider<ApiHelper, DeviceManagementRepository>(
-      update: (_, apiHelper, addDeviceRepo) {
-        return addDeviceRepo ?? DeviceManagementRepository(apiHelper);
-      },
+    final homeController = context.read<HomeProvider>();
+    return Provider<DeviceManagementRepository>(
+      create: (_) => DeviceManagementRepository(context.read<ApiHelper>()),
       child: ValueListenableProvider<TopologyInfo?>.value(
         value: homeController.topologyInfo,
-        child:
-            ProxyProvider2<
-              TopologyInfo?,
-              DeviceManagementRepository,
-              DeviceManagementProvider
-            >(
-              update:
-                  (
-                    BuildContext context,
-                    TopologyInfo? topologyInfo,
-                    DeviceManagementRepository repository,
-                    DeviceManagementProvider? previous,
-                  ) {
-                    final deviceMngmtProvider =
-                        previous ??
-                        DeviceManagementProvider(
-                          homeController.loadingStateProvider,
-                          homeController.alertStateProvider,
-                          repository,
-                        );
-                    deviceMngmtProvider.handleTopologyInfo(topologyInfo);
-                    return deviceMngmtProvider;
-                  },
-              child: const DeviceManagementScreen(),
-            ),
+        child: ProxyProvider<TopologyInfo?, DeviceManagementProvider>(
+          update:
+              (
+                BuildContext context,
+                TopologyInfo? topologyInfo,
+                DeviceManagementProvider? previous,
+              ) {
+                final deviceMngmtProvider =
+                    previous ??
+                    DeviceManagementProvider(
+                      homeController.loadingStateProvider,
+                      homeController.alertStateProvider,
+                      context.read<DeviceManagementRepository>(),
+                    );
+                deviceMngmtProvider.handleTopologyInfo(topologyInfo);
+                return deviceMngmtProvider;
+              },
+          dispose: (_, provider) => provider.dispose(),
+          child: const DeviceManagementScreen(),
+        ),
       ),
     );
   }

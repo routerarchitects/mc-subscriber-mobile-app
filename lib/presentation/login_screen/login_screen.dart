@@ -18,26 +18,25 @@ class LoginScreen extends StatefulWidget {
 
   static Widget builder(BuildContext context) {
     return MyApp.buildLoadingAlertProviders(
-      child:
-          ProxyProvider2<ApiHelper, SharedPreferencesHelper, LoginRepository>(
-            update: (_, apiHelper, sharedPrefHelper, loginRepo) {
-              return loginRepo ?? LoginRepository(apiHelper, sharedPrefHelper);
-            },
-            child:
-                ProxyProvider3<
-                  LoadingStateProvider,
-                  AlertStateProvider,
-                  LoginRepository,
-                  LoginProvider
-                >(
-                  update:
-                      (_, loadingState, alertState, loginRepo, loginProvider) {
-                        return loginProvider ??
-                            LoginProvider(loadingState, alertState, loginRepo);
-                      },
-                  child: const LoginScreen(),
-                ),
+      child: MultiProvider(
+        providers: [
+          Provider<LoginRepository>(
+            create: (_) => LoginRepository(
+              context.read<ApiHelper>(),
+              context.read<SharedPreferencesHelper>(),
+            ),
           ),
+          Provider<LoginProvider>(
+            create: (lCtx) => LoginProvider(
+              lCtx.read<LoadingStateProvider>(),
+              lCtx.read<AlertStateProvider>(),
+              lCtx.read<LoginRepository>(),
+            ),
+            dispose: (_, provider) => provider.dispose(),
+          ),
+        ],
+        child: const LoginScreen(),
+      ),
     );
   }
 

@@ -32,4 +32,8 @@ class OnboardingProvider {
   void navigateToHomeScreen() {
     NavigatorService.pushNamedAndRemoveUntil(AppRoutes.homeScreen);
   }
+
+  void dispose() {
+    // Clean up any resources here
+  }
 }

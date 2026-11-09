@@ -18,40 +18,23 @@ class SignUpScreen extends StatefulWidget {
 
   static Widget builder(BuildContext context) {
     return MyApp.buildLoadingAlertProviders(
-      child: ProxyProvider<ApiHelper, SignUpRepository>(
-        update: (_, apiHelper, signUpRepo) {
-          return signUpRepo ?? SignUpRepository(apiHelper);
-        },
-        child:
-            ProxyProvider5<
-              LoadingStateProvider,
-              AlertStateProvider,
-              SignUpRepository,
-              SharedPreferencesHelper,
-              ApiHelper,
-              SignUpProvider
-            >(
-              update:
-                  (
-                    _,
-                    loadingState,
-                    alertState,
-                    signUpRepo,
-                    sharedPreferencesHelper,
-                    apiHelper,
-                    signUpProvider,
-                  ) {
-                    return signUpProvider ??
-                        SignUpProvider(
-                          loadingState,
-                          alertState,
-                          signUpRepo,
-                          sharedPreferencesHelper,
-                          apiHelper,
-                        );
-                  },
-              child: const SignUpScreen(),
+      child: MultiProvider(
+        providers: [
+          Provider<SignUpRepository>(
+            create: (_) => SignUpRepository(context.read<ApiHelper>()),
+          ),
+          Provider<SignUpProvider>(
+            create: (lCtx) => SignUpProvider(
+              lCtx.read<LoadingStateProvider>(),
+              lCtx.read<AlertStateProvider>(),
+              lCtx.read<SignUpRepository>(),
+              lCtx.read<SharedPreferencesHelper>(),
+              lCtx.read<ApiHelper>(),
             ),
+            dispose: (_, provider) => provider.dispose(),
+          ),
+        ],
+        child: const SignUpScreen(),
       ),
     );
   }

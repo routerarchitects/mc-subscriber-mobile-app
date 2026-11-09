@@ -28,6 +28,7 @@ class CustomButton extends StatelessWidget {
     this.width,
     this.margin,
     this.padding,
+    this.border,
   }) : super(key: key);
 
   /// Text to display on the button
@@ -57,6 +58,9 @@ class CustomButton extends StatelessWidget {
   /// Internal padding of the button
   final EdgeInsetsGeometry? padding;
 
+  /// Button Border
+  final RoundedRectangleBorder? border;
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -66,19 +70,17 @@ class CustomButton extends StatelessWidget {
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor ?? Color(0xFF1172D3),
-          padding: padding ??
-              EdgeInsets.symmetric(
-                horizontal: 30.h,
-                vertical: 12.h,
-              ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8.h),
-          ),
+          padding:
+              padding ?? EdgeInsets.symmetric(horizontal: 30.h, vertical: 12.h),
+          shape:
+              border ??
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.h)),
         ),
         child: Text(
           text,
-          style: TextStyleHelper.instance.bodyTextInter
-              .copyWith(color: textColor ?? appTheme.whiteCustom),
+          style: TextStyleHelper.instance.bodyTextInter.copyWith(
+            color: textColor ?? appTheme.whiteCustom,
+          ),
         ),
       ),
     );

@@ -1,11 +1,9 @@
 import 'package:family_wifi/core/network/api_helper.dart';
 import 'package:family_wifi/core/utils/alert_state_provider.dart';
 import 'package:family_wifi/core/utils/loading_state_provider.dart';
-import 'package:family_wifi/core/utils/print_log_helper.dart';
 import 'package:family_wifi/core/utils/shared_preferences_helper.dart';
 import 'package:family_wifi/main.dart';
 import 'package:family_wifi/presentation/edit_network_screen/repository/edit_network_repository.dart';
-import 'package:family_wifi/presentation/home_screen/provider/home_provider.dart';
 import 'package:family_wifi/widgets/style_helper.dart';
 import 'package:flutter/material.dart';
 
@@ -21,43 +19,27 @@ class EditNetworkScreen extends StatefulWidget {
   static Widget builder(BuildContext context) {
     final input = ModalRoute.of(context)?.settings.arguments as Map;
     return MyApp.buildLoadingAlertProviders(
-      child:
-          ProxyProvider2<
-            ApiHelper,
-            SharedPreferencesHelper,
-            EditNetworkRepository
-          >(
-            update: (_, apiHelper, sharedPrefHelper, editNetworkRepo) {
-              return editNetworkRepo ??
-                  EditNetworkRepository(apiHelper, sharedPrefHelper);
-            },
-            child:
-                ProxyProvider3<
-                  LoadingStateProvider,
-                  AlertStateProvider,
-                  EditNetworkRepository,
-                  EditNetworkProvider
-                >(
-                  update:
-                      (
-                        _,
-                        loadingState,
-                        alertState,
-                        loginRepo,
-                        editNetworkProvider,
-                      ) {
-                        return editNetworkProvider ??
-                            EditNetworkProvider(
-                              loadingState,
-                              alertState,
-                              loginRepo,
-                              input['macAddress'],
-                              input['networkName'],
-                            );
-                      },
-                  child: const EditNetworkScreen(),
-                ),
+      child: MultiProvider(
+        providers: [
+          Provider<EditNetworkRepository>(
+            create: (_) => EditNetworkRepository(
+              context.read<ApiHelper>(),
+              context.read<SharedPreferencesHelper>(),
+            ),
           ),
+          Provider<EditNetworkProvider>(
+            create: (lCtx) => EditNetworkProvider(
+              lCtx.read<LoadingStateProvider>(),
+              lCtx.read<AlertStateProvider>(),
+              lCtx.read<EditNetworkRepository>(),
+              input['macAddress'],
+              input['networkName'],
+            ),
+            dispose: (_, provider) => provider.dispose(),
+          ),
+        ],
+        child: const EditNetworkScreen(),
+      ),
     );
   }
 

@@ -7,6 +7,7 @@ class MobileDeviceInfoModel {
     this.downloadSpeed = 'NA',
     String? iconPath,
     this.isPaused = false,
+    this.pausedUntil,
     this.isPauseResumeInProgress = false,
     this.isHistoricalDevice = false,
   }) : iconPath = iconPath ?? 'assets/images/img_depth_4_frame_0_1.svg';
@@ -17,6 +18,7 @@ class MobileDeviceInfoModel {
   final String downloadSpeed;
   final String? iconPath;
   final bool isPaused;
+  final String? pausedUntil;
   final bool isPauseResumeInProgress;
   final bool isHistoricalDevice;
 
@@ -27,6 +29,7 @@ class MobileDeviceInfoModel {
     String? downloadSpeed,
     String? iconPath,
     bool? isPaused,
+    String? pausedUntil,
     bool? isPauseResumeInProgress,
     bool? isHistoricalDevice,
   }) {
@@ -37,6 +40,7 @@ class MobileDeviceInfoModel {
       downloadSpeed: downloadSpeed ?? this.downloadSpeed,
       iconPath: iconPath ?? this.iconPath,
       isPaused: isPaused ?? this.isPaused,
+      pausedUntil: pausedUntil ?? this.pausedUntil,
       isPauseResumeInProgress:
           isPauseResumeInProgress ?? this.isPauseResumeInProgress,
       isHistoricalDevice: isHistoricalDevice ?? this.isHistoricalDevice,

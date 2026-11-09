@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+
 part 'configure_payload.g.dart';
 
 @JsonSerializable(includeIfNull: false)
@@ -14,10 +15,15 @@ class ConfigurePayload {
   factory ConfigurePayload.forClientPause({
     required String macAddress,
     required bool pause,
+    int? pauseDuration,
   }) {
     return ConfigurePayload(
       clientItems: [
-        ClientItem(mac: macAddress, access: pause ? 'deny' : 'allow'),
+        ClientItem(
+          mac: macAddress,
+          access: pause ? 'deny' : 'allow',
+          duration: pauseDuration,
+        ),
       ],
     );
   }
@@ -33,6 +39,7 @@ class ConfigurePayload {
 
   factory ConfigurePayload.fromJson(Map<String, dynamic> json) =>
       _$ConfigurePayloadFromJson(json);
+
   Map<String, dynamic> toJson() => _$ConfigurePayloadToJson(this);
 }
 
@@ -45,17 +52,20 @@ class EditNetworkItem {
 
   factory EditNetworkItem.fromJson(Map<String, dynamic> json) =>
       _$EditNetworkItemFromJson(json);
+
   Map<String, dynamic> toJson() => _$EditNetworkItemToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(includeIfNull: false)
 class ClientItem {
   String? mac;
   String? access;
+  int? duration;
 
-  ClientItem({this.mac, this.access});
+  ClientItem({this.mac, this.access, this.duration});
 
   factory ClientItem.fromJson(Map<String, dynamic> json) =>
       _$ClientItemFromJson(json);
+
   Map<String, dynamic> toJson() => _$ClientItemToJson(this);
 }

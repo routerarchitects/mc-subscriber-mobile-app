@@ -101,6 +101,8 @@ class Client {
   final double txSpeed;
   @JsonKey(name: 'blocked')
   Object? blockedRaw;
+  @JsonKey(name: 'blocked_until')
+  String? blockedUntil;
 
   Client({
     this.connected,
@@ -114,6 +116,7 @@ class Client {
     this.rxSpeed = 0,
     this.txSpeed = 0,
     this.blockedRaw,
+    this.blockedUntil,
   });
 
   bool get isBlocked => _parseBlocked(blockedRaw);

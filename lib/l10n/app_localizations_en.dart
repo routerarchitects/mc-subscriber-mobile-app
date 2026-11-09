@@ -27,6 +27,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get login_failed => 'Login Failed';
 
   @override
+  String get ok => 'Ok';
+
+  @override
   String get unable_to_reach_server => 'Unable to reach server at the moment.';
 
   @override
@@ -65,6 +68,44 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get subscribe_failed => 'Subscribe Failed';
+
+  @override
+  String get back_to_home => 'Back to Home';
+
+  @override
+  String get add_location => 'Add Location';
+
+  @override
+  String get location_name => 'Location Name';
+
+  @override
+  String get timezone => 'Timezone';
+
+  @override
+  String get empty_location_name => 'Please enter location name';
+
+  @override
+  String get invalid_location_timezone => 'Please select a valid timezone';
+
+  @override
+  String get location_setup_pending => 'Setup your location';
+
+  @override
+  String get location_setup_configuring =>
+      'Please wait while your location is being configured...';
+
+  @override
+  String get location_setup_configured =>
+      'Your location is successfully configured';
+
+  @override
+  String get subscriber_location_failed => 'Subscriber Location Failed';
+
+  @override
+  String get add_subscriber_location_success => 'Location added successfully';
+
+  @override
+  String get add_subscriber_location_failed => 'Failed to add location';
 
   @override
   String get topology_request_failed => 'Topology Request Failed';

@@ -17,34 +17,21 @@ class AddDeviceSetupScreen extends StatefulWidget {
 
   static Widget builder(BuildContext context) {
     return MyApp.buildLoadingAlertProviders(
-      child: ProxyProvider<ApiHelper, AddDeviceSetupRepository>(
-        update: (_, apiHelper, addDeviceRepo) {
-          return addDeviceRepo ?? AddDeviceSetupRepository(apiHelper);
-        },
-        child:
-            ProxyProvider3<
-              LoadingStateProvider,
-              AlertStateProvider,
-              AddDeviceSetupRepository,
-              AddDeviceSetupProvider
-            >(
-              update:
-                  (
-                    _,
-                    loadingState,
-                    alertState,
-                    addDeviceRepo,
-                    editNetworkProvider,
-                  ) {
-                    return editNetworkProvider ??
-                        AddDeviceSetupProvider(
-                          loadingState,
-                          alertState,
-                          addDeviceRepo,
-                        );
-                  },
-              child: const AddDeviceSetupScreen(),
+      child: MultiProvider(
+        providers: [
+          Provider<AddDeviceSetupRepository>(
+            create: (_) => AddDeviceSetupRepository(context.read<ApiHelper>()),
+          ),
+          Provider<AddDeviceSetupProvider>(
+            create: (lCtx) => AddDeviceSetupProvider(
+              lCtx.read<LoadingStateProvider>(),
+              lCtx.read<AlertStateProvider>(),
+              lCtx.read<AddDeviceSetupRepository>(),
             ),
+            dispose: (_, provider) => provider.dispose(),
+          ),
+        ],
+        child: const AddDeviceSetupScreen(),
       ),
     );
   }

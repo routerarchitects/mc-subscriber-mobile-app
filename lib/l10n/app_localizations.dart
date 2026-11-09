@@ -130,6 +130,12 @@ abstract class AppLocalizations {
   /// **'Login Failed'**
   String get login_failed;
 
+  /// No description provided for @ok.
+  ///
+  /// In en, this message translates to:
+  /// **'Ok'**
+  String get ok;
+
   /// No description provided for @unable_to_reach_server.
   ///
   /// In en, this message translates to:
@@ -201,6 +207,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Subscribe Failed'**
   String get subscribe_failed;
+
+  /// No description provided for @back_to_home.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to Home'**
+  String get back_to_home;
+
+  /// No description provided for @add_location.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Location'**
+  String get add_location;
+
+  /// No description provided for @location_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Location Name'**
+  String get location_name;
+
+  /// No description provided for @timezone.
+  ///
+  /// In en, this message translates to:
+  /// **'Timezone'**
+  String get timezone;
+
+  /// No description provided for @empty_location_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter location name'**
+  String get empty_location_name;
+
+  /// No description provided for @invalid_location_timezone.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a valid timezone'**
+  String get invalid_location_timezone;
+
+  /// No description provided for @location_setup_pending.
+  ///
+  /// In en, this message translates to:
+  /// **'Setup your location'**
+  String get location_setup_pending;
+
+  /// No description provided for @location_setup_configuring.
+  ///
+  /// In en, this message translates to:
+  /// **'Please wait while your location is being configured...'**
+  String get location_setup_configuring;
+
+  /// No description provided for @location_setup_configured.
+  ///
+  /// In en, this message translates to:
+  /// **'Your location is successfully configured'**
+  String get location_setup_configured;
+
+  /// No description provided for @subscriber_location_failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscriber Location Failed'**
+  String get subscriber_location_failed;
+
+  /// No description provided for @add_subscriber_location_success.
+  ///
+  /// In en, this message translates to:
+  /// **'Location added successfully'**
+  String get add_subscriber_location_success;
+
+  /// No description provided for @add_subscriber_location_failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to add location'**
+  String get add_subscriber_location_failed;
 
   /// No description provided for @topology_request_failed.
   ///

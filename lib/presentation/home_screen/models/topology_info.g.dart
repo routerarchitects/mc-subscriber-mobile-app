@@ -109,6 +109,7 @@ Client _$ClientFromJson(Map<String, dynamic> json) => Client(
   rxSpeed: (json['rx_speed'] as num?)?.toDouble() ?? 0,
   txSpeed: (json['tx_speed'] as num?)?.toDouble() ?? 0,
   blockedRaw: json['blocked'],
+  blockedUntil: json['blocked_until'] as String?,
 );
 
 Map<String, dynamic> _$ClientToJson(Client instance) => <String, dynamic>{
@@ -123,4 +124,5 @@ Map<String, dynamic> _$ClientToJson(Client instance) => <String, dynamic>{
   'rx_speed': instance.rxSpeed,
   'tx_speed': instance.txSpeed,
   'blocked': instance.blockedRaw,
+  'blocked_until': instance.blockedUntil,
 };

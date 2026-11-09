@@ -31,8 +31,15 @@ EditNetworkItem _$EditNetworkItemFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$EditNetworkItemToJson(EditNetworkItem instance) =>
     <String, dynamic>{'name': instance.name, 'password': instance.password};
 
-ClientItem _$ClientItemFromJson(Map<String, dynamic> json) =>
-    ClientItem(mac: json['mac'] as String?, access: json['access'] as String?);
+ClientItem _$ClientItemFromJson(Map<String, dynamic> json) => ClientItem(
+  mac: json['mac'] as String?,
+  access: json['access'] as String?,
+  duration: (json['duration'] as num?)?.toInt(),
+);
 
 Map<String, dynamic> _$ClientItemToJson(ClientItem instance) =>
-    <String, dynamic>{'mac': instance.mac, 'access': instance.access};
+    <String, dynamic>{
+      'mac': ?instance.mac,
+      'access': ?instance.access,
+      'duration': ?instance.duration,
+    };

@@ -36,7 +36,7 @@ class DeviceManagementRepository {
     }
   }
 
-  Future<Result> pauseResumeDevice(String macAddress, bool pause) async {
+  Future<Result> pauseResumeDevice(String macAddress, bool pause, {int? pauseDuration}) async {
     try {
       Map<String, dynamic> result = await _apiHelper.request(
         ApiConstants.action,
@@ -45,6 +45,7 @@ class DeviceManagementRepository {
         requestBody: ConfigurePayload.forClientPause(
           macAddress: macAddress,
           pause: pause,
+          pauseDuration: pauseDuration
         ),
       );
       if (result['Code'] != null) {

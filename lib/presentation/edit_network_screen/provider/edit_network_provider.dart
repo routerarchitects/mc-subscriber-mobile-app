@@ -38,7 +38,6 @@ class EditNetworkProvider with BaseBloc {
   void dispose() {
     networkNameController.dispose();
     passwordController.dispose();
-    super.dispose();
   }
 
   void init() {
