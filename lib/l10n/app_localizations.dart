@@ -136,6 +136,12 @@ abstract class AppLocalizations {
   /// **'Ok'**
   String get ok;
 
+  /// No description provided for @session_expired.
+  ///
+  /// In en, this message translates to:
+  /// **'Session Expired. Please login again.'**
+  String get session_expired;
+
   /// No description provided for @unable_to_reach_server.
   ///
   /// In en, this message translates to:

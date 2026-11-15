@@ -30,6 +30,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ok => 'Ok';
 
   @override
+  String get session_expired => 'Session Expired. Please login again.';
+
+  @override
   String get unable_to_reach_server => 'Unable to reach server at the moment.';
 
   @override

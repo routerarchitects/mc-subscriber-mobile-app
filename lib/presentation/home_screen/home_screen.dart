@@ -2,6 +2,7 @@ import 'package:family_wifi/core/app_export.dart';
 import 'package:family_wifi/core/network/api_helper.dart';
 import 'package:family_wifi/core/utils/alert_state_provider.dart';
 import 'package:family_wifi/core/utils/loading_state_provider.dart';
+import 'package:family_wifi/core/utils/print_log_helper.dart';
 import 'package:family_wifi/main.dart';
 import 'package:family_wifi/presentation/device_management_screen/device_management_screen.dart';
 import 'package:family_wifi/presentation/home_screen/bottom_bar_item.dart';
@@ -63,21 +64,26 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Future<void> postFrameCallback(Duration duration) async {
-    bool showSubscriberLocationPopup = await controller
-        .shouldAskSubscriberLocation();
-    if (showSubscriberLocationPopup) {
-      dynamic result = await StyleHelper.showAdaptiveBottomSheet(
-        context,
-        child: Provider.value(
-          value: context.read<SubscriberLocationRepository>(),
-          child: AddSubscriberLocation.builder(context),
-        ),
-      );
-      if (result == true) {
+    try {
+      bool showSubscriberLocationPopup = await controller
+          .shouldAskSubscriberLocation();
+      if (showSubscriberLocationPopup) {
+        dynamic result = await StyleHelper.showAdaptiveBottomSheet(
+          context,
+          child: Provider.value(
+            value: context.read<SubscriberLocationRepository>(),
+            child: AddSubscriberLocation.builder(context),
+          ),
+        );
+        if (result == true) {
+          controller.init();
+        }
+      } else {
         controller.init();
       }
-    } else {
-      controller.init();
+    } catch (e) {
+      // Handle exception here if needed
+      logPrint('home_screen: postFrameCallback: error--->$e');
     }
   }
 

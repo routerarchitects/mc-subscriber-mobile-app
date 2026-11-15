@@ -6,6 +6,7 @@
   "signup_failed": "Sign up Failed",
   "login_failed": "Login Failed",
   "ok": "Ok",
+  "session_expired": "Session Expired. Please login again.",
   "unable_to_reach_server": "Unable to reach server at the moment.",
   "out_of_coverage": "Please check your internet connection.",
   "something_went_wrong": "Something went wrong. Pls try again later.",

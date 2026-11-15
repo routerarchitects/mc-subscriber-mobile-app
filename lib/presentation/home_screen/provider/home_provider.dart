@@ -6,7 +6,6 @@ import 'package:family_wifi/core/utils/navigator_service.dart';
 import 'package:family_wifi/core/utils/print_log_helper.dart';
 import 'package:family_wifi/l10n/app_localization_extension.dart';
 import 'package:family_wifi/presentation/home_screen/bottom_bar_item.dart';
-import 'package:family_wifi/presentation/subscriber_location/models/subscriber_location.dart';
 import 'package:family_wifi/presentation/home_screen/models/topology_info.dart';
 import 'package:family_wifi/presentation/home_screen/repository/home_repository.dart';
 import 'package:family_wifi/presentation/subscriber_location/repository/subscriber_location_repository.dart';
@@ -57,10 +56,12 @@ class HomeProvider with BaseBloc {
 
   Future<bool> shouldAskSubscriberLocation() async {
     startLoading();
-    bool askSubscriberLocation = false;
+    SubscriberLocationResult? result;
     try {
-      askSubscriberLocation = await checkSubscriberLocation() == null;
-      dismissLoading();
+      result = await checkSubscriberLocation();
+      if (result != SubscriberLocationResult.SESSION_EXPIRED) {
+        dismissLoading();
+      }
     } catch (error) {
       dismissLoading();
       showAlert(
@@ -69,25 +70,30 @@ class HomeProvider with BaseBloc {
       );
     }
 
-    return askSubscriberLocation;
+    return result == SubscriberLocationResult.SESSION_EXPIRED
+        ? throw Exception('session_expired'.tr())
+        : result == SubscriberLocationResult.NOT_CONFIGURED;
   }
 
-  Future<SubscriberLocation?> checkSubscriberLocation() async {
+  Future<SubscriberLocationResult> checkSubscriberLocation() async {
     try {
       Result result = await _subsLocationRepository.fetchSubscriberLocation();
       if (result.isSuccess) {
-        return result.message;
+        return result.message != null
+            ? SubscriberLocationResult.CONFIGURED
+            : SubscriberLocationResult.NOT_CONFIGURED;
       } else if (result.sessionExpired) {
         NavigatorService.pushNamedAndRemoveUntil(AppRoutes.loginScreen);
-      } else if (!result.resourceNotFound) {
+        return SubscriberLocationResult.SESSION_EXPIRED;
+      } else if (result.resourceNotFound) {
+        return SubscriberLocationResult.NOT_CONFIGURED;
+      } else {
         throw Exception(result.message);
       }
     } catch (error) {
       logPrint(error);
       throw error;
     }
-
-    return null;
   }
 
   Future<void> fetchLatestData({bool showPopupLoader = true}) async {
@@ -116,3 +122,5 @@ class HomeProvider with BaseBloc {
     }
   }
 }
+
+enum SubscriberLocationResult { CONFIGURED, NOT_CONFIGURED, SESSION_EXPIRED }
