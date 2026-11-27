@@ -4,16 +4,16 @@ import 'package:family_wifi/core/network/result.dart';
 import 'package:family_wifi/core/utils/alert_state_provider.dart';
 import 'package:family_wifi/core/utils/base_bloc.dart';
 import 'package:family_wifi/core/utils/loading_state_provider.dart';
-import 'package:family_wifi/core/utils/streamer.dart';
 import 'package:family_wifi/core/utils/navigator_service.dart';
+import 'package:family_wifi/core/utils/streamer.dart';
 import 'package:family_wifi/l10n/app_localization_extension.dart';
+import 'package:family_wifi/presentation/device_management_screen/models/mobile_device_info_model.dart';
 import 'package:family_wifi/presentation/device_management_screen/models/router_device_info_model.dart';
 import 'package:family_wifi/presentation/device_management_screen/repository/device_management_repository.dart';
 import 'package:family_wifi/presentation/home_screen/models/topology_info.dart';
 import 'package:family_wifi/routes/app_routes.dart';
 import 'package:flutter/material.dart';
-
-import '../models/mobile_device_info_model.dart';
+import 'package:intl/intl.dart';
 
 class DeviceManagementProvider with BaseBloc {
   String? selectedNodeSerial;
@@ -22,14 +22,18 @@ class DeviceManagementProvider with BaseBloc {
       GlobalKey<RefreshIndicatorState>();
 
   final Streamer<List<MobileDeviceInfoModel>> _mobileDevices = new Streamer();
+
   Stream<List<MobileDeviceInfoModel>?> get mobileDevices =>
       _mobileDevices.stream;
+
   List<MobileDeviceInfoModel>? get mobileDevicesInitialData =>
       _mobileDevices.valueOrNull;
 
   final Streamer<List<RouterDeviceInfoModel>> _routerDevices = new Streamer();
+
   Stream<List<RouterDeviceInfoModel>?> get routerDevices =>
       _routerDevices.stream;
+
   List<RouterDeviceInfoModel>? get routerDevicesInitialData =>
       _routerDevices.valueOrNull;
 
@@ -57,54 +61,28 @@ class DeviceManagementProvider with BaseBloc {
             .toList();
       }
       List<MobileDeviceInfoModel> mobileDevices = topologyNodes
-          .map((tpNode) {
-            if (selectedNodeSerial == null ||
-                selectedNodeSerial == tpNode.serial) {
-              return tpNode.aps?.map((apNode) {
-                return apNode.clients?.map((clientNode) {
-                  return MobileDeviceInfoModel(
-                    macAddress: clientNode.station ?? 'NA',
-                    deviceName: (clientNode.fingerprint?.isNotEmpty ?? false)
-                        ? clientNode.fingerprint!
-                        : clientNode.station ?? 'NA',
-                    uploadSpeed: '${clientNode.txSpeed} Mbps ↑',
-                    downloadSpeed: '${clientNode.rxSpeed} Mbps ↓',
-                    isPaused: clientNode.isBlocked,
-                  );
-                });
-              });
-            }
-          })
-          .deepFlatten<MobileDeviceInfoModel>()
+          .where(
+            (tpNode) =>
+                selectedNodeSerial == null ||
+                tpNode.serial == selectedNodeSerial,
+          )
+          .expand((tpNode) => tpNode.aps ?? <AccessPoint>[])
+          .expand((apNode) => apNode.clients ?? <Client>[])
+          .map((clientNode) => _mapClientToModel(clientNode))
           .toList();
 
       if (topologyInfo.historicalClients?.isNotEmpty ?? false) {
         List<MobileDeviceInfoModel> historicalDevices = topologyInfo
             .historicalClients!
             .map(
-              (clientNode) => MobileDeviceInfoModel(
-                macAddress: clientNode.station ?? 'NA',
-                deviceName: (clientNode.fingerprint?.isNotEmpty ?? false)
-                    ? clientNode.fingerprint!
-                    : clientNode.station ?? 'NA',
-                uploadSpeed: '${clientNode.txSpeed} Mbps ↑',
-                downloadSpeed: '${clientNode.rxSpeed} Mbps ↓',
-                isPaused: clientNode.isBlocked,
-                isHistoricalDevice: true,
-              ),
+              (clientNode) =>
+                  _mapClientToModel(clientNode, isHistoricalDevice: true),
             )
             .toList();
         mobileDevices.addAll(historicalDevices);
       }
 
       _mobileDevices.value = mobileDevices;
-
-      // _mobileDevices.value = List.from(
-      //   _mobileDevices.value..addAll(List.from(_mobileDevices.value)),
-      // );
-      // _mobileDevices.value = List.from(
-      //   _mobileDevices.value..addAll(List.from(_mobileDevices.value)),
-      // );
 
       _routerDevices.value = topologyNodes.map((tpNode) {
         int noOfClients =
@@ -134,9 +112,42 @@ class DeviceManagementProvider with BaseBloc {
     }
   }
 
+  MobileDeviceInfoModel _mapClientToModel(
+    Client clientNode, {
+    bool isHistoricalDevice = false,
+  }) {
+    return MobileDeviceInfoModel(
+      macAddress: clientNode.station ?? 'NA',
+      deviceName: (clientNode.fingerprint?.isNotEmpty ?? false)
+          ? clientNode.fingerprint!
+          : clientNode.station ?? 'NA',
+      uploadSpeed: '${clientNode.txSpeed} Mbps ↑',
+      downloadSpeed: '${clientNode.rxSpeed} Mbps ↓',
+      isPaused: clientNode.isBlocked,
+      pausedUntil: pausedDurationLabel(clientNode.blockedUntil),
+      isHistoricalDevice: isHistoricalDevice,
+    );
+  }
+
+  String? pausedDurationLabel(String? pausedUntil) {
+    if (pausedUntil?.isEmpty ?? true) {
+      return null;
+    }
+    if (pausedUntil == 'indefinite') {
+      return 'Paused Indefinitely';
+    } else {
+      String? friendlyDateTime = pausedUntil!.friendlyDateTime;
+      if (friendlyDateTime != null) {
+        return 'Paused until $friendlyDateTime';
+      }
+    }
+    return null;
+  }
+
   Future<ToggleDevicePauseOutcome> toggleDevicePause(
-    MobileDeviceInfoModel device,
-  ) async {
+    MobileDeviceInfoModel device, {
+    int? pauseDuration,
+  }) async {
     final wasPaused = device.isPaused;
     _updateMobileDevice(
       device.macAddress,
@@ -147,19 +158,20 @@ class DeviceManagementProvider with BaseBloc {
       Result result = await _repository.pauseResumeDevice(
         device.macAddress,
         !wasPaused,
+        pauseDuration: pauseDuration != null && pauseDuration > 0
+            ? pauseDuration
+            : null,
       );
 
       if (result.isSuccess) {
         _updateMobileDevice(
           device.macAddress,
-          device.copyWith(
-            isPauseResumeInProgress: false,
-            isPaused: !wasPaused,
-          ),
+          device.copyWith(isPauseResumeInProgress: false, isPaused: !wasPaused),
         );
         return ToggleDevicePauseOutcome.success(
-          messageKey:
-              wasPaused ? 'resume_device_success' : 'pause_device_success',
+          messageKey: wasPaused
+              ? 'resume_device_success'
+              : 'pause_device_success',
           isPaused: !wasPaused,
         );
       } else if (result.sessionExpired) {
@@ -175,8 +187,7 @@ class DeviceManagementProvider with BaseBloc {
         );
         return ToggleDevicePauseOutcome.error(
           message: result.message?.toString(),
-          messageKey:
-              wasPaused ? 'resume_device_error' : 'pause_device_error',
+          messageKey: wasPaused ? 'resume_device_error' : 'pause_device_error',
         );
       }
     } catch (error) {
@@ -284,30 +295,32 @@ class ToggleDevicePauseOutcome {
   });
 
   const ToggleDevicePauseOutcome.sessionExpired()
-      : this._(status: ToggleDevicePauseStatus.sessionExpired);
+    : this._(status: ToggleDevicePauseStatus.sessionExpired);
 
   const ToggleDevicePauseOutcome.success({
     required String messageKey,
     bool? isPaused,
   }) : this._(
-          status: ToggleDevicePauseStatus.success,
-          messageKey: messageKey,
-          isPaused: isPaused,
-        );
+         status: ToggleDevicePauseStatus.success,
+         messageKey: messageKey,
+         isPaused: isPaused,
+       );
 
   const ToggleDevicePauseOutcome.error({
     String? message,
     String? messageKey,
     String? titleKey,
   }) : this._(
-          status: ToggleDevicePauseStatus.error,
-          message: message,
-          messageKey: messageKey,
-          titleKey: titleKey,
-        );
+         status: ToggleDevicePauseStatus.error,
+         message: message,
+         messageKey: messageKey,
+         titleKey: titleKey,
+       );
 
   bool get isSuccess => status == ToggleDevicePauseStatus.success;
+
   bool get isError => status == ToggleDevicePauseStatus.error;
+
   bool get isSessionExpired => status == ToggleDevicePauseStatus.sessionExpired;
 }
 
@@ -335,6 +348,7 @@ extension IterableExtension on Iterable {
 
 extension RateExtension on num? {
   double get bpsToMbps => (this ?? 0) > 0 ? this! / 1000000 : 0;
+
   double get bpsToKbps => (this ?? 0) > 0 ? this! / 1000 : 0;
 
   String get formatSeconds {
@@ -379,5 +393,61 @@ extension RateExtension on num? {
       return parts.join(', ');
     }
     return 'NA';
+  }
+}
+
+extension FriendlyDateTimeExtension on String {
+  String? get friendlyDateTime {
+    // Parse the JSON datetime string into a DateTime object
+    DateTime? blockedUntil = DateTime.tryParse(this);
+    if (blockedUntil == null) {
+      return null;
+    }
+    DateTime now = DateTime.now();
+
+    // Create date-only objects to ignore time during day comparisons
+    DateTime today = DateTime(now.year, now.month, now.day);
+    DateTime tomorrow = today.add(const Duration(days: 1));
+    DateTime targetDay = DateTime(
+      blockedUntil.year,
+      blockedUntil.month,
+      blockedUntil.day,
+    );
+
+    // Format the time portion (e.g., 4PM, 12PM, 8:30AM)
+    // 'ja' formats it to '12 PM'. Removing the space gives '12PM'.
+    String formattedTime = DateFormat(
+      'jm',
+    ).format(blockedUntil);
+
+    if (targetDay == today) {
+      return "Today $formattedTime";
+    } else if (targetDay == tomorrow) {
+      return "Tomorrow $formattedTime";
+    } else {
+      // Formats to "18th Sep" style.
+      // Note: 'd' gives day number. For custom suffixes like 'st', 'nd', 'rd', 'th',
+      // a small helper can be used, or standard 'd MMM' (e.g., 18 Sep) works great.
+      String dayWithSuffix = _getDayWithSuffix(blockedUntil.day);
+      String month = DateFormat('MMM').format(blockedUntil);
+      return "$dayWithSuffix $month, $formattedTime";
+    }
+  }
+
+  // Optional helper to add 'st', 'nd', 'rd', 'th' suffix to the day
+  String _getDayWithSuffix(int day) {
+    if (day >= 11 && day <= 13) {
+      return '${day}th';
+    }
+    switch (day % 10) {
+      case 1:
+        return '${day}st';
+      case 2:
+        return '${day}nd';
+      case 3:
+        return '${day}rd';
+      default:
+        return '${day}th';
+    }
   }
 }

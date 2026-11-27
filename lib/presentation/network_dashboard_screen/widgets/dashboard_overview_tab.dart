@@ -94,11 +94,13 @@ class _DashboardOverviewTabState extends State<DashboardOverviewTab>
                       ),
                       null,
                     ),
-                    autoZoomToFit: true, // Automatically zoom to fit all nodes
+                    autoZoomToFit: true,
+                    // Automatically zoom to fit all nodes
                     // initialNode: ValueKey('startNode'), // Jump to specific node on init
                     // panAnimationDuration: Duration(milliseconds: 600),
                     // toggleAnimationDuration: Duration(milliseconds: 400),
-                    centerGraph: true, // Center the graph in viewport
+                    centerGraph: true,
+                    // Center the graph in viewport
                     builder: (Node node) {
                       return buildNode(node);
                     },
@@ -171,10 +173,7 @@ class _DashboardOverviewTabState extends State<DashboardOverviewTab>
     }
     return Column(
       children: [
-        _buildPrivateNetworkSection(
-          accessPoint?.bssid,
-          accessPoint?.ssid,
-        ),
+        _buildPrivateNetworkSection(accessPoint?.bssid, accessPoint?.ssid),
         _buildGuestNetworkSection(),
         _buildMobileDeviceInfoSection(),
         Column(
@@ -291,81 +290,76 @@ class _DashboardOverviewTabState extends State<DashboardOverviewTab>
       barrierDismissible: true,
       builder: (context) {
         return Dialog(
-          child: ProxyProvider<ApiHelper, DeviceManagementRepository>(
-            update: (_, apiHelper, deviceMgmtRepo) {
-              return deviceMgmtRepo ?? DeviceManagementRepository(apiHelper);
-            },
+          child: Provider<DeviceManagementRepository>(
+            create: (_) =>
+                DeviceManagementRepository(context.read<ApiHelper>()),
             child: ValueListenableProvider<TopologyInfo?>.value(
               value: homeController.topologyInfo,
-              child:
-                  ProxyProvider<
-                    DeviceManagementRepository,
-                    DeviceManagementProvider
-                  >(
-                    update:
-                        (
-                          BuildContext context,
-                          DeviceManagementRepository repository,
-                          DeviceManagementProvider? previous,
-                        ) {
-                          final deviceMngmtProvider =
-                              previous ??
-                              DeviceManagementProvider(
-                                homeController.loadingStateProvider,
-                                homeController.alertStateProvider,
-                                repository,
-                              );
-                          deviceMngmtProvider.handleTopologyInfo(
-                            homeController.topologyInfo.value,
+              child: ProxyProvider<TopologyInfo?, DeviceManagementProvider>(
+                update:
+                    (
+                      BuildContext lCtx,
+                      TopologyInfo? topologyInfo,
+                      DeviceManagementProvider? previous,
+                    ) {
+                      final deviceMngmtProvider =
+                          previous ??
+                          DeviceManagementProvider(
+                            homeController.loadingStateProvider,
+                            homeController.alertStateProvider,
+                            lCtx.read<DeviceManagementRepository>(),
                           );
-                          return deviceMngmtProvider;
-                        },
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8.0,
-                            vertical: 8.0,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  'Mobile Device Clients',
-                                  style:
-                                      TextStyleHelper.instance.title18BoldInter,
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                              IconButton(
-                                onPressed: () => NavigatorService.goBack(),
-                                icon: Icon(Icons.close_rounded),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Flexible(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.only(
-                              topLeft: const Radius.circular(4.0),
-                              topRight: const Radius.circular(4.0),
-                              bottomLeft: const Radius.circular(32.0),
-                              bottomRight: const Radius.circular(32.0),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 1.0,
-                                vertical: 1.0,
-                              ),
-                              child: MobileDevicesTab(shrinkWrap: true),
+                      deviceMngmtProvider.handleTopologyInfo(
+                        homeController.topologyInfo.value,
+                      );
+                      return deviceMngmtProvider;
+                    },
+                dispose: (_, provider) => provider.dispose(),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0,
+                        vertical: 8.0,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Mobile Device Clients',
+                              style: TextStyleHelper.instance.title18BoldInter,
+                              textAlign: TextAlign.center,
                             ),
                           ),
-                        ),
-                      ],
+                          IconButton(
+                            onPressed: () => NavigatorService.goBack(),
+                            icon: Icon(Icons.close_rounded),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
+                    Flexible(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.only(
+                          topLeft: const Radius.circular(4.0),
+                          topRight: const Radius.circular(4.0),
+                          bottomLeft: const Radius.circular(32.0),
+                          bottomRight: const Radius.circular(32.0),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 1.0,
+                            vertical: 1.0,
+                          ),
+                          child: MobileDevicesTab(shrinkWrap: true),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         );

@@ -27,7 +27,6 @@ class LoginProvider with BaseBloc {
   void dispose() {
     emailController.dispose();
     passwordController.dispose();
-    super.dispose();
   }
 
   void init() {

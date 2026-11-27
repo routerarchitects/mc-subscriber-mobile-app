@@ -31,7 +31,7 @@ class AddDeviceSetupProvider with BaseBloc {
   @override
   void dispose() {
     macAddressController.dispose();
-    super.dispose();
+    configurationState.dispose();
   }
 
   void init() {

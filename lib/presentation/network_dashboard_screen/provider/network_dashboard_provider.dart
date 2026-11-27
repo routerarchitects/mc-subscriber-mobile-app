@@ -187,6 +187,11 @@ class NetworkDashboardProvider {
   void triggerPullToRefresh() {
     refreshIndicatorKey.currentState?.show();
   }
+
+  void dispose() {
+    mobileDeviceInfo.dispose();
+    displayGraph.dispose();
+  }
 }
 
 class GraphNodeInfo {

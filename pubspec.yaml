@@ -47,6 +47,7 @@ dependencies:
   open_mail_app_plus: ^0.0.2
   graphview: ^1.5.1
   el_tooltip: ^2.2.1
+  timezone: ^0.9.4
 dev_dependencies: 
   flutter_test:    # 🚨 CRITICAL: Required for Flutter project testing - DO NOT REMOVE
     sdk: flutter    # 🚨 CRITICAL: Required for Flutter project testing - DO NOT REMOVE

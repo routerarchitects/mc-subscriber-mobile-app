@@ -57,6 +57,15 @@ class MobileDeviceItemView extends StatelessWidget {
                       style: TextStyleHelper.instance.body14RegularInter,
                     ),
                   ),
+                if (device.isPaused && device.pausedUntil != null)
+                  FittedBox(
+                    child: Text(
+                      device.pausedUntil!,
+                      style: TextStyleHelper.instance.body12.copyWith(
+                        color: appTheme.gray_300,
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -70,26 +79,18 @@ class MobileDeviceItemView extends StatelessWidget {
               ),
             )
           else
-            FutureBuilder<String>(
-              future:
-                  (device.isPaused ? 'resume_action' : 'pause_action').tr(),
-              initialData: '',
-              builder: (context, snapshot) {
-                return CustomButton(
-                  width: 84.0,
-                  text: snapshot.data ?? '',
-                  onPressed: onPauseTap,
-                  backgroundColor: device.isHistoricalDevice
-                      ? Colors.grey
-                      : appTheme.blue_gray_900,
-                  fontSize: 14.fSize,
-                  fontWeight: FontWeight.w500,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 12.0,
-                    vertical: 6.0,
-                  ),
-                );
-              },
+            CustomButton(
+              width: 84.0,
+              text: device.isPaused
+                  ? context.translator.resume_action
+                  : context.translator.pause_action,
+              onPressed: onPauseTap,
+              backgroundColor: device.isHistoricalDevice
+                  ? Colors.grey
+                  : appTheme.blue_gray_900,
+              fontSize: 14.fSize,
+              fontWeight: FontWeight.w500,
+              padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
             ),
         ],
       ),

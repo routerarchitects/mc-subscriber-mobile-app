@@ -21,38 +21,23 @@ class PasswordResetConfirmationScreenTwo extends StatefulWidget {
         (ModalRoute.of(context)?.settings.arguments as Map?) ??
         <String, dynamic>{};
     return MyApp.buildLoadingAlertProviders(
-      child:
-          ProxyProvider<ApiHelper, SignUpRepository>(
-            update: (_, apiHelper, signUpRepo) {
-              return signUpRepo ?? SignUpRepository(apiHelper);
-            },
-            child:
-                ProxyProvider3<
-                  LoadingStateProvider,
-                  AlertStateProvider,
-                  SignUpRepository,
-                  PasswordResetConfirmationScreenTwoProvider
-                >(
-                  update:
-                      (
-                        _,
-                        loadingState,
-                        alertState,
-                        signUpRepo,
-                        pwdResetProvider,
-                      ) {
-                        return pwdResetProvider ??
-                            PasswordResetConfirmationScreenTwoProvider(
-                              loadingState,
-                              alertState,
-                              signUpRepo,
-                              input['email'],
-                              input['registrationId'],
-                            );
-                      },
-                  child: const PasswordResetConfirmationScreenTwo(),
-                ),
+      child: MultiProvider(
+        providers: [
+          Provider<SignUpRepository>(
+            create: (_) => SignUpRepository(context.read<ApiHelper>()),
           ),
+          Provider<PasswordResetConfirmationScreenTwoProvider>(
+            create: (lCtx) => PasswordResetConfirmationScreenTwoProvider(
+              lCtx.read<LoadingStateProvider>(),
+              lCtx.read<AlertStateProvider>(),
+              lCtx.read<SignUpRepository>(),
+              input['email'],
+              input['registrationId'],
+            ),
+          ),
+        ],
+        child: const PasswordResetConfirmationScreenTwo(),
+      ),
     );
   }
 
@@ -64,6 +49,7 @@ class PasswordResetConfirmationScreenTwo extends StatefulWidget {
 class _PasswordResetConfirmationScreenTwoState
     extends State<PasswordResetConfirmationScreenTwo> {
   late final PasswordResetConfirmationScreenTwoProvider controller;
+
   @override
   void initState() {
     super.initState();

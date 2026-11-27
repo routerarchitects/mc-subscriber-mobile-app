@@ -32,6 +32,11 @@ class ThemeHelper {
     return ThemeData(
       visualDensity: VisualDensity.standard,
       colorScheme: colorScheme,
+      canvasColor: appTheme.blue_gray_900_01,
+      bottomSheetTheme: BottomSheetThemeData(
+        showDragHandle: true,
+        dragHandleColor: _getThemeColors().grey400,
+      ),
     );
   }
 

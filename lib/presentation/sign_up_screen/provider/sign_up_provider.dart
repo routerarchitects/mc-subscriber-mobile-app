@@ -36,7 +36,6 @@ class SignUpProvider with BaseBloc {
     emailController.dispose();
     operatorIdController.dispose();
     customServerUrlController.dispose();
-    super.dispose();
   }
 
   Future<void> init() async {
